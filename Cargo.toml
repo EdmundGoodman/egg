@@ -36,14 +36,11 @@ saturating = "0.1.0"
 serde_json = {version = "1.0.81", optional = true}
 rayon = "1.10.0"
 
-[dev-dependencies]
+# for the math example
 ordered-float = "3.0.0"
-criterion = "0.3"
-pprof = { version = "0.4.2", features = ["flamegraph", "criterion"] }
 
-# [[bench]]
-# name = "fibonacci"
-# harness = false
+[dev-dependencies]
+criterion = "0.3"
 
 [[bench]]
 name = "math"
@@ -54,7 +51,8 @@ harness = false
 # lto = "fat"
 # panic = "abort"
 
-#[profile.bench]
+[profile.bench]
+debug = true
 #codegen-units = 1
 #lto = "fat"
 #panic = "abort"

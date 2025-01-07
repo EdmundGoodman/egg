@@ -35,6 +35,9 @@ mod macros;
 #[doc(hidden)]
 pub mod test;
 
+#[doc(hidden)]
+pub mod examples;
+
 pub mod tutorials;
 
 mod dot;
