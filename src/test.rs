@@ -81,7 +81,7 @@ pub fn test_runner<L, A>(
     if should_check {
         let report = runner.report();
         // println!("{report}");
-        // runner.egraph.check_goals(id, goals);
+        runner.egraph.check_goals(id, goals);
 
         if let Some(filename) = env_var::<PathBuf>("EGG_BENCH_CSV") {
             let mut file = File::options()
