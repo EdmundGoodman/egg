@@ -566,6 +566,9 @@ where
         let search_time = start_time.elapsed().as_secs_f64();
         info!("Search time: {}", search_time);
 
+        // // =================================================== //
+        // // ===== Novel algorithm with separated rebuilds ===== //
+        // // =================================================== //
         let apply_time = Instant::now();
 
         result = result.and_then(|_| {
@@ -587,15 +590,55 @@ where
         });
 
         let apply_time = apply_time.elapsed().as_secs_f64();
-        info!("Apply time: {}", apply_time);
 
         let rebuild_time = Instant::now();
         let n_rebuilds = self.egraph.rebuild();
         if self.egraph.are_explanations_enabled() {
             debug_assert!(self.egraph.check_each_explain(rules));
         }
-
         let rebuild_time = rebuild_time.elapsed().as_secs_f64();
+        // // =================================================== //
+
+
+        // // =================================================== //
+        // // ===== Old algorithm with interleaved rebuilds ===== //
+        // // =================================================== //
+        // let mut apply_time = 0.0_f64;
+        // let mut rebuild_time = 0.0_f64;
+        // let mut n_rebuilds = 0;
+
+        // result = result.and_then(|_| {
+        //     rules.iter().zip(matches).try_for_each(|(rw, ms)| {
+        //         let single_apply_time = Instant::now();
+        //         let total_matches: usize = ms.iter().map(|m| m.substs.len()).sum();
+        //         debug!("Applying {} {} times", rw.name, total_matches);
+
+        //         let actually_matched = self.scheduler.apply_rewrite(i, &mut self.egraph, rw, ms);
+        //         if actually_matched > 0 {
+        //             if let Some(count) = applied.get_mut(&rw.name) {
+        //                 *count += actually_matched;
+        //             } else {
+        //                 applied.insert(rw.name.to_owned(), actually_matched);
+        //             }
+        //             debug!("Applied {} {} times", rw.name, actually_matched);
+        //         }
+        //         let limits = self.check_limits();
+        //         apply_time += single_apply_time.elapsed().as_secs_f64();
+
+
+        //         let single_rebuild_time = Instant::now();
+        //         n_rebuilds += self.egraph.rebuild();
+        //         if self.egraph.are_explanations_enabled() {
+        //             debug_assert!(self.egraph.check_each_explain(rules));
+        //         }
+        //         rebuild_time += single_rebuild_time.elapsed().as_secs_f64();
+
+        //         limits
+        //     })
+        // });
+        // // =================================================== //
+
+        info!("Apply time: {}", apply_time);
         info!("Rebuild time: {}", rebuild_time);
         info!(
             "Size: n={}, e={}",
