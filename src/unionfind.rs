@@ -34,12 +34,22 @@ impl UnionFind {
     }
 
     pub fn find_mut(&mut self, mut current: Id) -> Id {
-        while current != self.parent(current) {
-            let grandparent = self.parent(self.parent(current));
-            *self.parent_mut(current) = grandparent;
-            current = grandparent;
+        // while current != self.parent(current) {
+        //     let grandparent = self.parent(self.parent(current));
+        //     *self.parent_mut(current) = grandparent;
+        //     current = grandparent;
+        // }
+        // current
+
+        // Perform path compression after finding root
+        let root = self.find(current);
+        let mut node = current;
+        while node != root {
+            let parent = self.parent(node);
+            *self.parent_mut(node) = root;
+            node = parent;
         }
-        current
+        root
     }
 
     /// Given two leader ids, unions the two eclasses making root1 the leader.
@@ -52,6 +62,7 @@ impl UnionFind {
 #[cfg(test)]
 mod tests {
     use super::*;
+    // use union_find::{UnionFind as UnionFindLib, UnionBySize, QuickUnionUf};
 
     fn ids(us: impl IntoIterator<Item = usize>) -> Vec<Id> {
         us.into_iter().map(|u| u.into()).collect()
@@ -89,4 +100,25 @@ mod tests {
         let expected = vec![0, 0, 0, 0, 4, 5, 6, 6, 6, 6];
         assert_eq!(uf.parents, ids(expected));
     }
+
+    // #[test]
+    // fn union_find_example() {
+    //     // build a union find datastructure for 10 elements with quick unions,
+    //     // merge the unions by size.
+    //     let mut uf = QuickUnionUf::<UnionBySize>::new(10);
+
+    //     // initially each element is in it's own set
+    //     for i in 0..10 {
+    //         assert_eq!(uf.find(i), i);
+    //     }
+
+    //     // join sets containing 0 and 1
+    //     assert!(uf.union(0,1));
+
+    //     assert_eq!(uf.find(0), 0);
+    //     assert_eq!(uf.find(1), 0);
+    //     for i in 2..10 {
+    //         assert_eq!(uf.find(i), i);
+    //     }
+    // }
 }
