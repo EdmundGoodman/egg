@@ -1,6 +1,7 @@
 use std::fmt::{self, Debug, Formatter};
 
 use log::*;
+use rayon::prelude::*;
 
 use crate::*;
 
@@ -781,13 +782,41 @@ where
         rewrites: &[&'a Rewrite<L, N>],
         limits: &RunnerLimits,
     ) -> RunnerResult<Vec<Vec<SearchMatches<'a, L>>>> {
-        let mut matches = Vec::new();
-        for rw in rewrites {
-            let ms = self.search_rewrite(iteration, egraph, rw);
-            matches.push(ms);
-            limits.check_limits(iteration, egraph)?;
-        }
-        Ok(matches)
+        // let mut matches = Vec::new();
+        // for rw in rewrites {
+        //     let ms = self.search_rewrite(iteration, egraph, rw);
+        //     matches.push(ms);
+        //     limits.check_limits(iteration, egraph)?;
+        // }
+        // Ok(matches)
+
+
+        rewrites
+            .par_iter()
+            .map(|rw| {
+                let ms = rw.search(egraph);
+                // limits.check_limits(iteration, egraph)?;
+                Ok(ms)
+            })
+            .collect::<RunnerResult<Vec<Vec<SearchMatches<'a, L>>>>>()
+
+        // Ok(
+        //     rewrites
+        //         .par_iter()
+        //         .map(|rw| rw.search(egraph))
+        //         .collect::<Vec<Vec<SearchMatches<'a, L>>>>()
+        // )
+
+
+        // fn par_map<T, F, T2>(slice: &[T], f: F) -> Vec<T2>
+        //      where
+        //          T: Send + Sync,
+        //          F: Fn(&T) -> T2 + Send + Sync,
+        //          T2: Send + Sync,
+        // {
+        //     slice.iter().map(f).collect()
+        // }
+        // Ok(par_map(rewrites, |rw| rw.search(egraph)))
     }
 
     /// A hook allowing you to customize rewrite application behavior.

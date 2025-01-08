@@ -30,11 +30,11 @@ use thiserror::Error;
 ///
 /// See [`SymbolLang`] for quick-and-dirty use cases.
 #[allow(clippy::len_without_is_empty)]
-pub trait Language: Debug + Clone + Eq + Ord + Hash {
+pub trait Language: Debug + Clone + Eq + Ord + Hash + Sync + Send {
     /// Type representing the cases of this language.
     ///
     /// Used for short-circuiting the search for equivalent nodes.
-    type Discriminant: Debug + Clone + Eq + Hash;
+    type Discriminant: Debug + Clone + Eq + Hash + Sync + Send;
 
     /// Return the `Discriminant` of this node.
     #[allow(enum_intrinsics_non_enums)]
@@ -781,9 +781,9 @@ assert_eq!(runner.egraph.find(runner.roots[0]), runner.egraph.find(just_foo));
 [`math.rs`]: https://github.com/egraphs-good/egg/blob/main/tests/math.rs
 [`prop.rs`]: https://github.com/egraphs-good/egg/blob/main/tests/prop.rs
 */
-pub trait Analysis<L: Language>: Sized {
+pub trait Analysis<L: Language>: Sized + Sync + Send {
     /// The per-[`EClass`] data for this analysis.
-    type Data: Debug;
+    type Data: Debug + Sync + Send;
 
     /// Makes a new [`Analysis`] data for a given e-node.
     ///

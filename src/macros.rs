@@ -81,8 +81,8 @@ define_language! {
         "*" = Mult([Id; 2]),
     }
     where
-    S: Hash + Debug + Display + Clone + Eq + Ord + Hash + FromStr,
-    T: Hash + Debug + Display + Clone + Eq + Ord + Hash + FromStr,
+    S: Hash + Debug + Display + Clone + Eq + Ord + Hash + FromStr + Sync + Send,
+    T: Hash + Debug + Display + Clone + Eq + Ord + Hash + FromStr + Sync + Send,
     // also required by the macro impl that parses S, T
     <S as FromStr>::Err: Debug,
     <T as FromStr>::Err: Debug,
