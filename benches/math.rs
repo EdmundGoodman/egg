@@ -36,10 +36,10 @@ pub fn math_bench(c: &mut Criterion) {
         "math_simplify_root",
         |b| b.iter(math_simplify_root)
     );
-    c.bench_function(
-        "math_simplify_factor",
-        |b| b.iter(math_simplify_factor)
-    );
+    //c.bench_function(
+    //    "math_simplify_factor",
+    //    |b| b.iter(math_simplify_factor)
+    //);
 }
 
 criterion_group!(benches, math_bench);

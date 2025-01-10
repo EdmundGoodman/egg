@@ -790,33 +790,17 @@ where
         // }
         // Ok(matches)
 
+        // println!("Number of rewrites: {}", rewrites.len());
 
         rewrites
             .par_iter()
+            // .iter()
             .map(|rw| {
                 let ms = rw.search(egraph);
-                // limits.check_limits(iteration, egraph)?;
+                limits.check_limits(iteration, egraph)?;
                 Ok(ms)
             })
             .collect::<RunnerResult<Vec<Vec<SearchMatches<'a, L>>>>>()
-
-        // Ok(
-        //     rewrites
-        //         .par_iter()
-        //         .map(|rw| rw.search(egraph))
-        //         .collect::<Vec<Vec<SearchMatches<'a, L>>>>()
-        // )
-
-
-        // fn par_map<T, F, T2>(slice: &[T], f: F) -> Vec<T2>
-        //      where
-        //          T: Send + Sync,
-        //          F: Fn(&T) -> T2 + Send + Sync,
-        //          T2: Send + Sync,
-        // {
-        //     slice.iter().map(f).collect()
-        // }
-        // Ok(par_map(rewrites, |rw| rw.search(egraph)))
     }
 
     /// A hook allowing you to customize rewrite application behavior.
