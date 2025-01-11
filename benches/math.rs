@@ -5,18 +5,6 @@ use definitions::math;
 
 use criterion::{criterion_group, criterion_main, Criterion};
 
-// fn math_() {
-//     egg::test::test_runner(
-//         "",
-//         None,
-//         &math::rules(),
-//         "".parse().unwrap(),
-//         &["".parse().unwrap()],
-//         None,
-//         true
-//     )
-// }
-
 fn math_associate_adds() {
     egg::test::test_runner(
         "math_associate_adds",
@@ -35,6 +23,7 @@ fn math_associate_adds() {
 }
 
 // NOTE: Less suitable for benchmarking
+//
 // fn math_fail() {
 //     let _ = std::panic::catch_unwind(
 //         || egg::test::test_runner(
@@ -276,60 +265,6 @@ fn integ_part3() {
     )
 }
 
-pub fn ematching_benches(c: &mut Criterion) {
-    let exprs = &[
-        "(i (ln x) x)",
-        "(i (+ x (cos x)) x)",
-        "(i (* (cos x) x) x)",
-        "(d x (+ 1 (* 2 x)))",
-        "(d x (- (pow x 3) (* 7 (pow x 2))))",
-        "(+ (* y (+ x y)) (- (+ x 2) (+ x x)))",
-        "(/ 1 (- (/ (+ 1 (sqrt five)) 2) (/ (- 1 (sqrt five)) 2)))",
-    ];
-
-    let extra_patterns = &[
-        "(+ ?a (+ ?b ?c))",
-        "(+ (+ ?a ?b) ?c)",
-        "(* ?a (* ?b ?c))",
-        "(* (* ?a ?b) ?c)",
-        "(+ ?a (* -1 ?b))",
-        "(* ?a (pow ?b -1))",
-        "(* ?a (+ ?b ?c))",
-        "(pow ?a (+ ?b ?c))",
-        "(+ (* ?a ?b) (* ?a ?c))",
-        "(* (pow ?a ?b) (pow ?a ?c))",
-        "(* ?x (/ 1 ?x))",
-        "(d ?x (+ ?a ?b))",
-        "(+ (d ?x ?a) (d ?x ?b))",
-        "(d ?x (* ?a ?b))",
-        "(+ (* ?a (d ?x ?b)) (* ?b (d ?x ?a)))",
-        "(d ?x (sin ?x))",
-        "(d ?x (cos ?x))",
-        "(* -1 (sin ?x))",
-        "(* -1 (cos ?x))",
-        "(i (cos ?x) ?x)",
-        "(i (sin ?x) ?x)",
-        "(d ?x (ln ?x))",
-        "(d ?x (pow ?f ?g))",
-        "(* (pow ?f ?g) (+ (* (d ?x ?f) (/ ?g ?f)) (* (d ?x ?g) (ln ?f))))",
-        "(i (pow ?x ?c) ?x)",
-        "(/ (pow ?x (+ ?c 1)) (+ ?c 1))",
-        "(i (+ ?f ?g) ?x)",
-        "(i (- ?f ?g) ?x)",
-        "(+ (i ?f ?x) (i ?g ?x))",
-        "(- (i ?f ?x) (i ?g ?x))",
-        "(i (* ?a ?b) ?x)",
-        "(- (* ?a (i ?b ?x)) (i (* (d ?x ?a) (i ?b ?x)) ?x))",
-    ];
-
-    c.bench_function(
-        "ematching_benches",
-        |b| b.iter(
-            || egg::test::bench_egraph("math", math::rules(), exprs, extra_patterns)
-        )
-    );
-}
-
 pub fn math_tests(c: &mut Criterion) {
     let mut group = c.benchmark_group("math_tests");
     group.bench_function(
@@ -413,6 +348,60 @@ pub fn math_tests(c: &mut Criterion) {
         |b| b.iter(integ_part3)
     );
     group.finish();
+}
+
+pub fn ematching_benches(c: &mut Criterion) {
+    let exprs = &[
+        "(i (ln x) x)",
+        "(i (+ x (cos x)) x)",
+        "(i (* (cos x) x) x)",
+        "(d x (+ 1 (* 2 x)))",
+        "(d x (- (pow x 3) (* 7 (pow x 2))))",
+        "(+ (* y (+ x y)) (- (+ x 2) (+ x x)))",
+        "(/ 1 (- (/ (+ 1 (sqrt five)) 2) (/ (- 1 (sqrt five)) 2)))",
+    ];
+
+    let extra_patterns = &[
+        "(+ ?a (+ ?b ?c))",
+        "(+ (+ ?a ?b) ?c)",
+        "(* ?a (* ?b ?c))",
+        "(* (* ?a ?b) ?c)",
+        "(+ ?a (* -1 ?b))",
+        "(* ?a (pow ?b -1))",
+        "(* ?a (+ ?b ?c))",
+        "(pow ?a (+ ?b ?c))",
+        "(+ (* ?a ?b) (* ?a ?c))",
+        "(* (pow ?a ?b) (pow ?a ?c))",
+        "(* ?x (/ 1 ?x))",
+        "(d ?x (+ ?a ?b))",
+        "(+ (d ?x ?a) (d ?x ?b))",
+        "(d ?x (* ?a ?b))",
+        "(+ (* ?a (d ?x ?b)) (* ?b (d ?x ?a)))",
+        "(d ?x (sin ?x))",
+        "(d ?x (cos ?x))",
+        "(* -1 (sin ?x))",
+        "(* -1 (cos ?x))",
+        "(i (cos ?x) ?x)",
+        "(i (sin ?x) ?x)",
+        "(d ?x (ln ?x))",
+        "(d ?x (pow ?f ?g))",
+        "(* (pow ?f ?g) (+ (* (d ?x ?f) (/ ?g ?f)) (* (d ?x ?g) (ln ?f))))",
+        "(i (pow ?x ?c) ?x)",
+        "(/ (pow ?x (+ ?c 1)) (+ ?c 1))",
+        "(i (+ ?f ?g) ?x)",
+        "(i (- ?f ?g) ?x)",
+        "(+ (i ?f ?x) (i ?g ?x))",
+        "(- (i ?f ?x) (i ?g ?x))",
+        "(i (* ?a ?b) ?x)",
+        "(- (* ?a (i ?b ?x)) (i (* (d ?x ?a) (i ?b ?x)) ?x))",
+    ];
+
+    c.bench_function(
+        "ematching_benches",
+        |b| b.iter(
+            || egg::test::bench_egraph("math", math::rules(), exprs, extra_patterns)
+        )
+    );
 }
 
 criterion_group!(benches, ematching_benches);
