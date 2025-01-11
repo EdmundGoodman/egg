@@ -38,6 +38,11 @@ serde_json = {version = "1.0.81", optional = true}
 [dev-dependencies]
 ordered-float = "3.0.0"
 
+[profile.release]
+codegen-units = 1
+lto = "fat"
+panic = "abort"
+
 [features]
 # forces the use of indexmaps over hashmaps
 deterministic = []
