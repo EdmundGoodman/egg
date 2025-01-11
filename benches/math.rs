@@ -399,7 +399,7 @@ pub fn ematching_benches(c: &mut Criterion) {
     c.bench_function(
         "ematching_benches",
         |b| b.iter(
-            || egg::test::bench_egraph("math", math::rules(), exprs, extra_patterns)
+            || egg::test::bench_egraph("math", math::rules(), exprs, extra_patterns, None)
         )
     );
 }

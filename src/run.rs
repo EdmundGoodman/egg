@@ -1,5 +1,6 @@
 use std::fmt::{self, Debug, Formatter};
 
+// TODO: Switch to being feature flag
 use rayon::prelude::*;
 
 use log::*;
