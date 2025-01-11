@@ -1409,7 +1409,7 @@ impl<L: Language, N: Analysis<L>> EGraph<L, N> {
         let trimmed_nodes = self.rebuild_classes();
 
         let elapsed = start.elapsed();
-        info!(
+        debug!(
             concat!(
                 "REBUILT! in {}.{:03}s\n",
                 "  Old: hc size {}, eclasses: {}\n",

@@ -38,7 +38,7 @@ existing-bench: math.csv lambda.csv
 
 .PHONY: clean-bench
 clean-bench:
-	rm math.csv lambda.csv profile.json
+	rm -f math.csv lambda.csv profile.json
 
 .PHONY: bench
 bench:

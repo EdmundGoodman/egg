@@ -91,7 +91,7 @@ pub fn test_runner<L, A>(
                 .append(true)
                 .open(&filename)
                 .unwrap_or_else(|_| panic!("Couldn't open {:?}", filename));
-            // writeln!(file, "{},{}", name, runner.report().total_time).unwrap();
+            writeln!(file, "{},{}", name, runner.report().total_time).unwrap();
         }
 
         if runner.egraph.are_explanations_enabled() {

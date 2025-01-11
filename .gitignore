@@ -18,3 +18,5 @@ profile.json
 .vscode/settings.json
 out.csv
 tmp*
+math.csv
+lambda.csv
