@@ -135,6 +135,7 @@ pub fn bench_egraph<L, N>(
     rules: Vec<Rewrite<L, N>>,
     exprs: &[&str],
     extra_patterns: &[&str],
+    scheduled_runner: Option<Runner<L, N, ()>>,
 ) -> EGraph<L, N>
 where
     L: Language + FromOp + 'static + Display,
@@ -174,8 +175,12 @@ where
         iter_limit, node_limit, time_limit
     );
 
-    let mut runner = Runner::default()
-        .with_scheduler(SimpleScheduler)
+    let mut runner = if let Some(runner_unwrapped) = scheduled_runner {
+        runner_unwrapped
+    } else {
+        Runner::default().with_scheduler(SimpleScheduler)
+    };
+    runner = runner
         .with_hook(move |runner| {
             let n_nodes = runner.egraph.total_number_of_nodes();
             // eprintln!("Iter {}, {} nodes", runner.iterations.len(), n_nodes);

@@ -42,6 +42,10 @@ bench:
 profile.json:
 	cargo build --profile test && samply record cargo bench
 
+.PHONY: report
+report:
+	open target/criterion/report/index.html
+
 .PHONY: clean
 clean:
 	rm -f math.csv lambda.csv profile.json

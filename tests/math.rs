@@ -405,7 +405,7 @@ fn math_ematching_bench() {
         "(- (* ?a (i ?b ?x)) (i (* (d ?x ?a) (i ?b ?x)) ?x))",
     ];
 
-    egg::test::bench_egraph("math", rules(), exprs, extra_patterns);
+    egg::test::bench_egraph("math", rules(), exprs, extra_patterns, None);
 }
 
 #[test]

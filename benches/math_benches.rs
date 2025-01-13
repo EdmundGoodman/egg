@@ -1,4 +1,4 @@
-use egg::test;
+use egg::{test, IteratorScheduler, ParallelIteratorScheduler};
 
 mod definitions;
 use definitions::math;
@@ -51,6 +51,8 @@ const EXTRA_PATTERNS: &'static [&'static str] = &[
     "(- (* ?a (i ?b ?x)) (i (* (d ?x ?a) (i ?b ?x)) ?x))",
 ];
 
+
+
 pub fn ematching_benches(c: &mut Criterion) {
     c.bench_function(
         "ematching_benches",
@@ -60,10 +62,56 @@ pub fn ematching_benches(c: &mut Criterion) {
                 math::rules(),
                 EXPRS,
                 EXTRA_PATTERNS,
+                Some(egg::Runner::default().with_scheduler(IteratorScheduler))
             )
         )
     );
 }
 
-criterion_group!(benches, ematching_benches);
+pub fn ematching_benches_parallel(c: &mut Criterion) {
+    c.bench_function(
+        "ematching_benches_parallel",
+        |b| b.iter(
+            || test::bench_egraph(
+                "math",
+                math::rules(),
+                EXPRS,
+                EXTRA_PATTERNS,
+                Some(egg::Runner::default().with_scheduler(ParallelIteratorScheduler))
+            )
+        )
+    );
+}
+
+pub fn ematching_benches_comparison(c: &mut Criterion) {
+    let mut group = c.benchmark_group("ematching_benches_comparison");
+    group.bench_function(
+        "serial",
+        |b| b.iter(
+            || test::bench_egraph(
+                "math",
+                math::rules(),
+                EXPRS,
+                EXTRA_PATTERNS,
+                Some(egg::Runner::default().with_scheduler(IteratorScheduler))
+            )
+        )
+    );
+    group.bench_function(
+        "parallel",
+        |b| b.iter(
+            || test::bench_egraph(
+                "math",
+                math::rules(),
+                EXPRS,
+                EXTRA_PATTERNS,
+                Some(egg::Runner::default().with_scheduler(ParallelIteratorScheduler))
+            )
+        )
+    );
+    group.finish();
+
+}
+
+criterion_group!(benches, ematching_benches_comparison);
 criterion_main!(benches);

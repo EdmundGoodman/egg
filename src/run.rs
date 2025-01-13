@@ -1026,7 +1026,8 @@ where
 }
 
 /// A very simple [`RewriteScheduler`] that uses `rayon` to parallelise. It
-/// must be compiled with the `parallel` feature enabled.
+/// must be compiled with the `parallel` feature enabled, otherwise it will
+/// use the default [`search_rewrite`] implementation.
 ///
 /// This does not implement all the features provided by the default
 /// [`BackoffScheduler`], so must be compared to the [`IteratorScheduler`] for
