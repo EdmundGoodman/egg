@@ -399,5 +399,5 @@ fn lambda_ematching_bench() {
         "(lam ?fresh (let ?v1 ?e (let ?v2 (var ?fresh) ?body)))",
     ];
 
-    egg::test::bench_egraph("lambda", rules(), exprs, extra_patterns);
+    egg::test::bench_egraph("lambda", rules(), exprs, extra_patterns, None);
 }

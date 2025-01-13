@@ -173,7 +173,7 @@ where
         }
 
         let solution = self.model.solve();
-        log::info!(
+        log::debug!(
             "CBC status {:?}, {:?}",
             solution.raw().status(),
             solution.raw().secondary_status()
