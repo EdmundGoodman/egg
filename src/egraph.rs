@@ -1220,10 +1220,12 @@ impl<L: Language + Display, N: Analysis<L>> EGraph<L, N> {
     /// Useful for testing.
     pub fn check_goals(&self, id: Id, goals: &[Pattern<L>]) {
         let (cost, best) = Extractor::new(self, AstSize).find_best(id);
-        println!("End ({}): {}", cost, best.pretty(80));
+        // println!("End ({}): {}", cost, best.pretty(80));
+        info!("End ({}): {}", cost, best.pretty(80));
 
         for (i, goal) in goals.iter().enumerate() {
-            println!("Trying to prove goal {}: {}", i, goal.pretty(40));
+            // println!("Trying to prove goal {}: {}", i, goal.pretty(40));
+            info!("Trying to prove goal {}: {}", i, goal.pretty(40));
             let matches = goal.search_eclass(self, id);
             if matches.is_none() {
                 let best = Extractor::new(self, AstSize).find_best(id).1;
@@ -1409,7 +1411,7 @@ impl<L: Language, N: Analysis<L>> EGraph<L, N> {
         let trimmed_nodes = self.rebuild_classes();
 
         let elapsed = start.elapsed();
-        info!(
+        debug!(
             concat!(
                 "REBUILT! in {}.{:03}s\n",
                 "  Old: hc size {}, eclasses: {}\n",
@@ -1492,6 +1494,7 @@ mod tests {
         de(&egraph);
 
         let json_rep = serde_json::to_string_pretty(&egraph).unwrap();
-        println!("{}", json_rep);
+        // println!("{}", json_rep);
+        info!("{}", json_rep);
     }
 }
