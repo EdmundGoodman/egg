@@ -53,7 +53,7 @@ const EXTRA_PATTERNS: &'static [&'static str] = &[
 
 
 
-pub fn ematching_benches(c: &mut Criterion) {
+pub fn ematching_benches_serial(c: &mut Criterion) {
     c.bench_function(
         "ematching_benches",
         |b| b.iter(

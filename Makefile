@@ -36,11 +36,16 @@ lambda.csv:
 
 .PHONY: bench
 bench:
-	cargo build --profile test && cargo bench
+	cargo build --profile bench && cargo bench
 
 .PHONY: profile.json
 profile.json:
-	cargo build --profile test && samply record cargo bench
+	cargo build --profile bench && samply record cargo bench
+
+.PHONY: flamegraph.svg
+flamegraph.svg:
+	cargo flamegraph --root --bench math_tests -- --bench &&\
+		open -a /Applications/Firefox.app flamegraph.svg
 
 .PHONY: report
 report:

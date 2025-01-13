@@ -351,5 +351,72 @@ pub fn math_tests(c: &mut Criterion) {
 }
 
 
-criterion_group!(benches, math_tests);
+fn diff_power_harder_iterator() {
+    egg::test::test_runner(
+        "diff_power_harder",
+        Some(Runner::default()
+                .with_scheduler(IteratorScheduler)
+                .with_time_limit(std::time::Duration::from_secs(10))
+                .with_iter_limit(60)
+                .with_node_limit(100_000)
+                // .with_explanations_enabled()
+                // HACK this needs to "see" the end expression
+                .with_expr(&"(* x (- (* 3 x) 14))".parse().unwrap())),
+        &math::rules(),
+        "(d x (- (pow x 3) (* 7 (pow x 2))))".parse().unwrap(),
+        &["(* x (- (* 3 x) 14))".parse().unwrap()],
+        None,
+        true
+    )
+}
+
+fn diff_power_harder_parallel_iterator() {
+    egg::test::test_runner(
+        "diff_power_harder",
+        Some(Runner::default()
+                .with_scheduler(ParallelIteratorScheduler)
+                .with_time_limit(std::time::Duration::from_secs(10))
+                .with_iter_limit(60)
+                .with_node_limit(100_000)
+                // .with_explanations_enabled()
+                // HACK this needs to "see" the end expression
+                .with_expr(&"(* x (- (* 3 x) 14))".parse().unwrap())),
+        &math::rules(),
+        "(d x (- (pow x 3) (* 7 (pow x 2))))".parse().unwrap(),
+        &["(* x (- (* 3 x) 14))".parse().unwrap()],
+        None,
+        true
+    )
+}
+
+
+pub fn math_test_serial(c: &mut Criterion) {
+    c.bench_function(
+        "diff_power_harder_iterator",
+        |b| b.iter(diff_power_harder_iterator)
+    );
+}
+
+pub fn math_test_parallel(c: &mut Criterion) {
+    c.bench_function(
+        "diff_power_harder_parallel_iterator",
+        |b| b.iter(diff_power_harder_parallel_iterator)
+    );
+}
+
+pub fn math_test_comparison(c: &mut Criterion) {
+    let mut group = c.benchmark_group("math_test_comparison");
+    group.bench_function(
+        "diff_power_harder_iterator",
+        |b| b.iter(diff_power_harder_iterator)
+    );
+    group.bench_function(
+        "diff_power_harder_parallel_iterator",
+        |b| b.iter(diff_power_harder_parallel_iterator)
+    );
+    group.finish();
+
+}
+
+criterion_group!(benches, math_test_comparison);
 criterion_main!(benches);

@@ -36,14 +36,15 @@ saturating = "0.1.0"
 serde_json = {version = "1.0.81", optional = true}
 
 # for parallelisation support
-rayon = { version = "1.8", optional = true }
+rayon = "1.8"
+# rayon = { version = "1.8", optional = true }
 
 [dev-dependencies]
 ordered-float = "3.0.0"
 criterion = "0.3"
 
 [[bench]]
-name = "math_benches"
+name = "math_tests"
 harness = false
 
 [profile.bench]
@@ -70,7 +71,7 @@ serde-1 = [
   "vectorize",
 ]
 wasm-bindgen = []
-parallel = ["rayon"]
+# parallel = ["rayon"]
 
 # private features for testing
 test-explanations = []

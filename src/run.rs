@@ -1,6 +1,6 @@
 use std::fmt::{self, Debug, Formatter};
 
-#[cfg(feature = "parallel")]
+// #[cfg(feature = "parallel")]
 use rayon::prelude::*;
 
 use log::*;
@@ -1047,7 +1047,7 @@ where
     N: Analysis<L> + Sync + Send,
     N::Data: Sync + Send
 {
-    #[cfg(feature = "parallel")]
+    // #[cfg(feature = "parallel")]
     fn search_rewrites<'a>(
         &mut self,
         iteration: usize,
