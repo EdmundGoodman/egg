@@ -49,6 +49,14 @@ harness = false
 
 [profile.bench]
 debug = true
+# codegen-units = 1
+# lto = "fat"
+# panic = "abort"
+
+# [profile.release]
+# codegen-units = 1
+# lto = "fat"
+# panic = "abort"
 
 [features]
 # forces the use of indexmaps over hashmaps
