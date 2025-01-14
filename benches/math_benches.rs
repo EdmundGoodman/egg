@@ -51,9 +51,11 @@ const EXTRA_PATTERNS: &'static [&'static str] = &[
     "(- (* ?a (i ?b ?x)) (i (* (d ?x ?a) (i ?b ?x)) ?x))",
 ];
 
-pub fn ematching_benches(c: &mut Criterion) {
+
+
+pub fn math_ematching_benches(c: &mut Criterion) {
     c.bench_function(
-        "ematching_benches",
+        "math_ematching_benches",
         |b| b.iter(
             || test::bench_egraph(
                 "math",
@@ -65,5 +67,5 @@ pub fn ematching_benches(c: &mut Criterion) {
     );
 }
 
-criterion_group!(benches, ematching_benches);
+criterion_group!(benches, math_ematching_benches);
 criterion_main!(benches);
