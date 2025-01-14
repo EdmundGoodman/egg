@@ -43,25 +43,25 @@ rayon = "1.8"
 ordered-float = "3.0.0"
 criterion = "0.3"
 
-[[bench]]
-name = "simple"
-harness = false
+# [[bench]]
+# name = "simple"
+# harness = false
 
-[[bench]]
-name = "math_tests"
-harness = false
+# [[bench]]
+# name = "math_tests"
+# harness = false
 
-[[bench]]
-name = "math_benches"
-harness = false
+# [[bench]]
+# name = "math_benches"
+# harness = false
 
 [[bench]]
 name = "lambda_tests"
 harness = false
 
-[[bench]]
-name = "lambda_benches"
-harness = false
+# [[bench]]
+# name = "lambda_benches"
+# harness = false
 
 # [profile.bench]
 # debug = true

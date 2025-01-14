@@ -304,8 +304,9 @@ fn lambda_function_repeat_iterator(repeats: i32) {
         "lambda_function_repeat",
         Some(Runner::default()
             .with_scheduler(IteratorScheduler)
-            .with_iter_limit(10_000)
-            .with_node_limit(2_500_000)),
+            .with_time_limit(std::time::Duration::from_secs(20))
+            .with_node_limit(25_000_000)
+            .with_iter_limit(60)),
         &lambda::rules(),
         format!("(let compose (lam f (lam g (lam x (app (var f)
                                        (app (var g) (var x))))))
@@ -331,8 +332,9 @@ fn lambda_function_repeat_parallel_iterator(repeats: i32) {
         "lambda_function_repeat",
         Some(Runner::default()
             .with_scheduler(ParallelIteratorScheduler)
-            .with_iter_limit(10_000)
-            .with_node_limit(2_500_000)),
+            .with_time_limit(std::time::Duration::from_secs(20))
+            .with_node_limit(25_000_000)
+            .with_iter_limit(60)),
             &lambda::rules(),
             format!("(let compose (lam f (lam g (lam x (app (var f)
                                            (app (var g) (var x))))))
@@ -384,6 +386,7 @@ pub fn lambda_test_comparison_large(c: &mut Criterion) {
     //     "lambda_function_repeat_parallel_iterator",
     //     |b| b.iter(|| lambda_function_repeat_parallel_iterator(3))
     // );
+    group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
     for i in 2..6 {
         group.bench_with_input(BenchmarkId::new("lambda_function_repeat_iterator", i), &i,
         |b, i| b.iter(|| lambda_function_repeat_iterator(*i)));
@@ -417,10 +420,10 @@ pub fn lambda_test_comparison_small(c: &mut Criterion) {
 
 criterion_group!(
     benches,
-    lambda_tests,
+    // lambda_tests,
     // lambda_test_serial,
     // lambda_test_parallel,
-    lambda_test_comparison_small,
+    // lambda_test_comparison_small,
     lambda_test_comparison_large
 );
 criterion_main!(benches);
