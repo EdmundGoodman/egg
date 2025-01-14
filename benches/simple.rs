@@ -6,7 +6,7 @@ use schedulers::schedulers::{IteratorScheduler, ParallelIteratorScheduler};
 mod definitions;
 use definitions::simple;
 
-use criterion::{criterion_group, criterion_main, Criterion, BenchmarkId};
+use criterion::{criterion_group, criterion_main, Criterion};
 
 
 fn serial_simplify(s: &str) -> String {
@@ -71,5 +71,10 @@ pub fn comparison_simple_bench(c: &mut Criterion) {
 }
 
 
-criterion_group!(benches, comparison_simple_bench);
+criterion_group!(
+    benches,
+    // serial_simple_bench,
+    // parallel_simple_bench,
+    comparison_simple_bench
+);
 criterion_main!(benches);

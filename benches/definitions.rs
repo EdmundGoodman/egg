@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 pub mod simple {
     use egg::*;
 
@@ -26,6 +27,7 @@ pub mod simple {
     // ];
 }
 
+#[allow(dead_code)]
 pub mod math {
     use egg::{rewrite as rw, *};
     use ordered_float::NotNan;
@@ -240,6 +242,7 @@ pub mod math {
     ]}
 }
 
+#[allow(dead_code)]
 pub mod lambda {
     use egg::{rewrite as rw, *};
     use rustc_hash::FxHashSet as HashSet;

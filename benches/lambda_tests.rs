@@ -6,7 +6,7 @@ use schedulers::schedulers::{IteratorScheduler, ParallelIteratorScheduler};
 mod definitions;
 use definitions::lambda;
 
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion, BenchmarkId};
 
 
 fn lambda_under() {
@@ -299,15 +299,15 @@ fn lambda_compose_parallel_iterator() {
     );
 }
 
-fn lambda_function_repeat_iterator() {
+fn lambda_function_repeat_iterator(repeats: i32) {
     egg::test::test_runner(
         "lambda_function_repeat",
         Some(Runner::default()
             .with_scheduler(IteratorScheduler)
-            .with_iter_limit(60)
-            .with_node_limit(150_000)),
+            .with_iter_limit(10_000)
+            .with_node_limit(2_500_000)),
         &lambda::rules(),
-        "(let compose (lam f (lam g (lam x (app (var f)
+        format!("(let compose (lam f (lam g (lam x (app (var f)
                                        (app (var g) (var x))))))
      (let repeat (fix repeat (lam fun (lam n
         (if (= (var n) 0)
@@ -319,35 +319,35 @@ fn lambda_function_repeat_iterator() {
      (let add1 (lam y (+ (var y) 1))
      (app (app (var repeat)
                (var add1))
-          2))))".parse().unwrap(),
-        &["(lam ?x (+ (var ?x) 2))".parse().unwrap()],
+          {repeats}))))").parse().unwrap(),
+        &[format!("(lam ?x (+ (var ?x) {repeats}))").parse().unwrap()],
         None,
         true
     );
 }
 
-fn lambda_function_repeat_parallel_iterator() {
+fn lambda_function_repeat_parallel_iterator(repeats: i32) {
     egg::test::test_runner(
         "lambda_function_repeat",
         Some(Runner::default()
             .with_scheduler(ParallelIteratorScheduler)
-            .with_iter_limit(60)
-            .with_node_limit(500_000)),
-        &lambda::rules(),
-        "(let compose (lam f (lam g (lam x (app (var f)
-                                       (app (var g) (var x))))))
-     (let repeat (fix repeat (lam fun (lam n
-        (if (= (var n) 0)
-            (lam i (var i))
-            (app (app (var compose) (var fun))
-                 (app (app (var repeat)
-                           (var fun))
-                      (+ (var n) -1)))))))
-     (let add1 (lam y (+ (var y) 1))
-     (app (app (var repeat)
-               (var add1))
-          2))))".parse().unwrap(),
-        &["(lam ?x (+ (var ?x) 2))".parse().unwrap()],
+            .with_iter_limit(10_000)
+            .with_node_limit(2_500_000)),
+            &lambda::rules(),
+            format!("(let compose (lam f (lam g (lam x (app (var f)
+                                           (app (var g) (var x))))))
+         (let repeat (fix repeat (lam fun (lam n
+            (if (= (var n) 0)
+                (lam i (var i))
+                (app (app (var compose) (var fun))
+                     (app (app (var repeat)
+                               (var fun))
+                          (+ (var n) -1)))))))
+         (let add1 (lam y (+ (var y) 1))
+         (app (app (var repeat)
+                   (var add1))
+              {repeats}))))").parse().unwrap(),
+            &[format!("(lam ?x (+ (var ?x) {repeats}))").parse().unwrap()],
         None,
         true
     );
@@ -359,7 +359,7 @@ pub fn lambda_test_serial(c: &mut Criterion) {
     group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
     group.bench_function(
         "lambda_function_repeat_iterator",
-        |b| b.iter(lambda_function_repeat_iterator)
+        |b| b.iter(|| lambda_function_repeat_iterator(3))
     );
     group.finish();
 }
@@ -369,21 +369,27 @@ pub fn lambda_test_parallel(c: &mut Criterion) {
     group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
     group.bench_function(
         "lambda_function_repeat_parallel_iterator",
-        |b| b.iter(lambda_function_repeat_parallel_iterator)
+        |b| b.iter(|| lambda_function_repeat_parallel_iterator(3))
     );
     group.finish();
 }
 
 pub fn lambda_test_comparison_large(c: &mut Criterion) {
     let mut group = c.benchmark_group("lambda_test_comparison_large");
-    group.bench_function(
-        "lambda_function_repeat_iterator",
-        |b| b.iter(lambda_function_repeat_iterator)
-    );
-    group.bench_function(
-        "lambda_function_repeat_parallel_iterator",
-        |b| b.iter(lambda_function_repeat_parallel_iterator)
-    );
+    // group.bench_function(
+    //     "lambda_function_repeat_iterator",
+    //     |b| b.iter(lambda_function_repeat_iterator(3))
+    // );
+    // group.bench_function(
+    //     "lambda_function_repeat_parallel_iterator",
+    //     |b| b.iter(|| lambda_function_repeat_parallel_iterator(3))
+    // );
+    for i in 2..6 {
+        group.bench_with_input(BenchmarkId::new("lambda_function_repeat_iterator", i), &i,
+        |b, i| b.iter(|| lambda_function_repeat_iterator(*i)));
+        group.bench_with_input(BenchmarkId::new("lambda_function_repeat_parallel_iterator", i), &i,
+        |b, i| b.iter(|| lambda_function_repeat_parallel_iterator(*i)));
+    }
     group.finish();
 }
 
@@ -411,7 +417,9 @@ pub fn lambda_test_comparison_small(c: &mut Criterion) {
 
 criterion_group!(
     benches,
-    // lambda_tests
+    lambda_tests,
+    // lambda_test_serial,
+    // lambda_test_parallel,
     lambda_test_comparison_small,
     lambda_test_comparison_large
 );

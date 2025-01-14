@@ -428,5 +428,11 @@ pub fn math_test_comparison(c: &mut Criterion) {
 }
 
 // criterion_group!(benches, math_tests);
-criterion_group!(benches, math_test_comparison);
+criterion_group!(
+    benches,
+    math_tests,
+    // math_test_serial,
+    // math_test_parallel,
+    math_test_comparison
+);
 criterion_main!(benches);

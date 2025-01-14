@@ -95,7 +95,7 @@ pub fn lambda_ematching_benches_parallel(c: &mut Criterion) {
 }
 
 pub fn lambda_ematching_benches_comparison(c: &mut Criterion) {
-    let mut group = c.benchmark_group("ematching_benches_comparison");
+    let mut group = c.benchmark_group("lambda_ematching_benches_comparison");
     group.bench_function(
         "serial",
         |b| b.iter(
