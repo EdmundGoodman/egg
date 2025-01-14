@@ -44,7 +44,9 @@ ordered-float = "3.0.0"
 criterion = "0.3"
 
 [[bench]]
-name = "math_tests"
+name = "simple"
+# name = "math_tests"
+# name = "math_benches"
 harness = false
 
 [profile.bench]
