@@ -20,10 +20,10 @@ pub mod simple {
         ]
     }
 
-    pub const EXAMPLE_INPUTS: &'static [&'static str] = &[
-        "(* 0 42)",
-        "(+ 0 (* 1 foo))"
-    ];
+    // pub const EXAMPLE_INPUTS: &'static [&'static str] = &[
+    //     "(* 0 42)",
+    //     "(+ 0 (* 1 foo))"
+    // ];
 }
 
 pub mod math {
@@ -245,7 +245,7 @@ pub mod lambda {
     use rustc_hash::FxHashSet as HashSet;
 
     define_language! {
-        enum Lambda {
+        pub enum Lambda {
             Bool(bool),
             Num(i32),
 
@@ -277,15 +277,15 @@ pub mod lambda {
     type EGraph = egg::EGraph<Lambda, LambdaAnalysis>;
 
     #[derive(Default)]
-    struct LambdaAnalysis;
+    pub struct LambdaAnalysis;
 
     #[derive(Debug)]
-    struct Data {
+    pub struct Data {
         free: HashSet<Id>,
         constant: Option<(Lambda, PatternAst<Lambda>)>,
     }
 
-    fn eval(egraph: &EGraph, enode: &Lambda) -> Option<(Lambda, PatternAst<Lambda>)> {
+    pub fn eval(egraph: &EGraph, enode: &Lambda) -> Option<(Lambda, PatternAst<Lambda>)> {
         let x = |i: &Id| egraph[*i].data.constant.as_ref().map(|c| &c.0);
         match enode {
             Lambda::Num(n) => Some((enode.clone(), format!("{}", n).parse().unwrap())),
@@ -357,19 +357,19 @@ pub mod lambda {
         }
     }
 
-    fn var(s: &str) -> Var {
+    pub fn var(s: &str) -> Var {
         s.parse().unwrap()
     }
 
-    fn is_not_same_var(v1: Var, v2: Var) -> impl Fn(&mut EGraph, Id, &Subst) -> bool {
+    pub fn is_not_same_var(v1: Var, v2: Var) -> impl Fn(&mut EGraph, Id, &Subst) -> bool {
         move |egraph, _, subst| egraph.find(subst[v1]) != egraph.find(subst[v2])
     }
 
-    fn is_const(v: Var) -> impl Fn(&mut EGraph, Id, &Subst) -> bool {
+    pub fn is_const(v: Var) -> impl Fn(&mut EGraph, Id, &Subst) -> bool {
         move |egraph, _, subst| egraph[subst[v]].data.constant.is_some()
     }
 
-    fn rules() -> Vec<Rewrite<Lambda, LambdaAnalysis>> {
+    pub fn rules() -> Vec<Rewrite<Lambda, LambdaAnalysis>> {
         vec![
             // open term rules
             rw!("if-true";  "(if  true ?then ?else)" => "?then"),
@@ -406,7 +406,7 @@ pub mod lambda {
         ]
     }
 
-    struct CaptureAvoid {
+    pub struct CaptureAvoid {
         fresh: Var,
         v2: Var,
         e: Var,

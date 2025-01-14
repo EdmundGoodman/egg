@@ -1,4 +1,7 @@
-use egg::{test, IteratorScheduler, ParallelIteratorScheduler};
+use egg::test;
+
+mod schedulers;
+use schedulers::schedulers::{IteratorScheduler, ParallelIteratorScheduler};
 
 mod definitions;
 use definitions::math;
@@ -53,9 +56,9 @@ const EXTRA_PATTERNS: &'static [&'static str] = &[
 
 
 
-pub fn ematching_benches_serial(c: &mut Criterion) {
+pub fn math_ematching_benches_serial(c: &mut Criterion) {
     c.bench_function(
-        "ematching_benches",
+        "math_ematching_benches_serial",
         |b| b.iter(
             || test::bench_egraph(
                 "math",
@@ -68,9 +71,9 @@ pub fn ematching_benches_serial(c: &mut Criterion) {
     );
 }
 
-pub fn ematching_benches_parallel(c: &mut Criterion) {
+pub fn math_ematching_benches_parallel(c: &mut Criterion) {
     c.bench_function(
-        "ematching_benches_parallel",
+        "math_ematching_benches_parallel",
         |b| b.iter(
             || test::bench_egraph(
                 "math",
@@ -83,7 +86,7 @@ pub fn ematching_benches_parallel(c: &mut Criterion) {
     );
 }
 
-pub fn ematching_benches_comparison(c: &mut Criterion) {
+pub fn math_ematching_benches_comparison(c: &mut Criterion) {
     let mut group = c.benchmark_group("ematching_benches_comparison");
     group.bench_function(
         "serial",
@@ -113,5 +116,5 @@ pub fn ematching_benches_comparison(c: &mut Criterion) {
 
 }
 
-criterion_group!(benches, ematching_benches_comparison);
+criterion_group!(benches, math_ematching_benches_comparison);
 criterion_main!(benches);

@@ -1,8 +1,10 @@
 use egg::*;
 
+mod schedulers;
+use schedulers::schedulers::{IteratorScheduler, ParallelIteratorScheduler};
+
 mod definitions;
 use definitions::simple;
-
 
 use criterion::{criterion_group, criterion_main, Criterion, BenchmarkId};
 
@@ -51,12 +53,20 @@ pub fn parallel_simple_bench(c: &mut Criterion) {
 
 pub fn comparison_simple_bench(c: &mut Criterion) {
     let mut group = c.benchmark_group("simplify");
-    for i in simple::EXAMPLE_INPUTS.iter() {
-        group.bench_with_input(BenchmarkId::new("serial_simplify", i), i,
-            |b, i| b.iter(|| serial_simplify(*i)));
-        group.bench_with_input(BenchmarkId::new("parallel_simplify", i), i,
-            |b, i| b.iter(|| parallel_simplify(*i)));
-    }
+    group.bench_function(
+        "serial",
+        |b| b.iter(|| serial_simplify("(+ 0 (* 1 foo))"))
+    );
+    group.bench_function(
+        "parallel",
+        |b| b.iter(|| parallel_simplify("(+ 0 (* 1 foo))"))
+    );
+    // for i in simple::EXAMPLE_INPUTS.iter() {
+    //     group.bench_with_input(BenchmarkId::new("serial_simplify", i), i,
+    //         |b, i| b.iter(|| serial_simplify(*i)));
+    //     group.bench_with_input(BenchmarkId::new("parallel_simplify", i), i,
+    //         |b, i| b.iter(|| parallel_simplify(*i)));
+    // }
     group.finish();
 }
 

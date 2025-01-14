@@ -1,5 +1,8 @@
 use egg::{rewrite as rw, *};
 
+mod schedulers;
+use schedulers::schedulers::{IteratorScheduler, ParallelIteratorScheduler};
+
 mod definitions;
 use definitions::math;
 
@@ -391,17 +394,23 @@ fn diff_power_harder_parallel_iterator() {
 
 
 pub fn math_test_serial(c: &mut Criterion) {
-    c.bench_function(
+    let mut group = c.benchmark_group("math_test_serial");
+    group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
+    group.bench_function(
         "diff_power_harder_iterator",
         |b| b.iter(diff_power_harder_iterator)
     );
+    group.finish();
 }
 
 pub fn math_test_parallel(c: &mut Criterion) {
-    c.bench_function(
+    let mut group = c.benchmark_group("math_test_parallel");
+    group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
+    group.bench_function(
         "diff_power_harder_parallel_iterator",
         |b| b.iter(diff_power_harder_parallel_iterator)
     );
+    group.finish();
 }
 
 pub fn math_test_comparison(c: &mut Criterion) {
@@ -418,5 +427,6 @@ pub fn math_test_comparison(c: &mut Criterion) {
 
 }
 
+// criterion_group!(benches, math_tests);
 criterion_group!(benches, math_test_comparison);
 criterion_main!(benches);
