@@ -223,5 +223,57 @@ pub fn lambda_tests(c: &mut Criterion) {
 }
 
 
-criterion_group!(benches, lambda_tests);
+fn lambda_function_repeat_parameterised(repeats: i32) {
+    egg::test::test_runner(
+        "lambda_function_repeat",
+        Some(Runner::default()
+            .with_time_limit(std::time::Duration::from_secs(20))
+            .with_node_limit(25_000_000)
+            .with_iter_limit(60)),
+        &lambda::rules(),
+        format!("(let compose (lam f (lam g (lam x (app (var f)
+                                       (app (var g) (var x))))))
+     (let repeat (fix repeat (lam fun (lam n
+        (if (= (var n) 0)
+            (lam i (var i))
+            (app (app (var compose) (var fun))
+                 (app (app (var repeat)
+                           (var fun))
+                      (+ (var n) -1)))))))
+     (let add1 (lam y (+ (var y) 1))
+     (app (app (var repeat)
+               (var add1))
+          {repeats}))))").parse().unwrap(),
+        &[format!("(lam ?x (+ (var ?x) {repeats}))").parse().unwrap()],
+        None,
+        true
+    );
+}
+
+pub fn lambda_test_scaling(c: &mut Criterion) {
+    let mut group = c.benchmark_group("lambda_test_comparison_large");
+    group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
+    for i in 2..6 {
+        group.bench_with_input(BenchmarkId::new("lambda_function_repeat", i), &i,
+        |b, i| b.iter(|| lambda_function_repeat_parameterised(*i)));
+    }
+    group.finish();
+}
+
+pub fn lambda_test(c: &mut Criterion) {
+    let mut group = c.benchmark_group("lambda_test_comparison_large");
+    group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
+    group.bench_function(
+        "lambda_function_repeat",
+        |b| b.iter(lambda_function_repeat)
+    );
+    group.finish();
+}
+
+criterion_group!(
+    benches,
+    // lambda_tests,
+    // lambda_test_scaling,
+    lambda_test
+);
 criterion_main!(benches);

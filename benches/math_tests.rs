@@ -350,6 +350,16 @@ pub fn math_tests(c: &mut Criterion) {
     group.finish();
 }
 
+pub fn math_test(c: &mut Criterion) {
+    let mut group = c.benchmark_group("math_test");
+    group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
+    group.bench_function(
+        "diff_power_harder",
+        |b| b.iter(diff_power_harder)
+    );
+    group.finish();
+}
+
 // criterion_group!(benches, math_tests);
-criterion_group!(benches, math_tests);
+criterion_group!(benches, math_test);
 criterion_main!(benches);
