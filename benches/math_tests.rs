@@ -354,6 +354,45 @@ pub fn math_tests(c: &mut Criterion) {
     group.finish();
 }
 
+fn diff_power_harder_iterator() {
+    egg::test::test_runner(
+        "diff_power_harder",
+        Some(Runner::default()
+                .with_scheduler(IteratorScheduler)
+                .with_time_limit(std::time::Duration::from_secs(30))
+                .with_iter_limit(60)
+                .with_node_limit(100_000)
+                // .with_explanations_enabled()
+                // HACK this needs to "see" the end expression
+                .with_expr(&"(* x (- (* 3 x) 14))".parse().unwrap())),
+        &math::rules(),
+        "(d x (- (pow x 3) (* 7 (pow x 2))))".parse().unwrap(),
+        &["(* x (- (* 3 x) 14))".parse().unwrap()],
+        None,
+        true
+    )
+}
+
+fn diff_power_harder_parallel() {
+    egg::test::test_runner(
+        "diff_power_harder",
+        Some(Runner::default()
+                .with_scheduler(ParallelIteratorScheduler)
+                .with_time_limit(std::time::Duration::from_secs(10))
+                .with_iter_limit(60)
+                .with_node_limit(100_000)
+                // .with_explanations_enabled()
+                // HACK this needs to "see" the end expression
+                .with_expr(&"(* x (- (* 3 x) 14))".parse().unwrap())),
+        &math::rules(),
+        "(d x (- (pow x 3) (* 7 (pow x 2))))".parse().unwrap(),
+        &["(* x (- (* 3 x) 14))".parse().unwrap()],
+        None,
+        true
+    )
+}
+
+
 
 fn generate_ascending_rpn(n: usize) -> String {
     if n == 0 {
@@ -393,7 +432,7 @@ fn generate_descending_rpn(n: usize) -> String {
     result
  }
 
-fn math_associate_adds_iterator_parameterised(n: usize) {
+fn math_associate_adds_iterator(n: usize) {
     egg::test::test_runner(
         "math_associate_adds",
         Some(Runner::default()
@@ -412,113 +451,82 @@ fn math_associate_adds_iterator_parameterised(n: usize) {
     )
 }
 
-fn math_associate_adds_iterator_parallel_parameterised(n: usize) {
+fn math_associate_adds_parallel(n: usize) {
     egg::test::test_runner(
         "math_associate_adds",
-        Some(Runner::default()
-                .with_scheduler(IteratorScheduler)
-                .with_time_limit(std::time::Duration::from_secs(30))
-                .with_iter_limit(60)
-                .with_node_limit(50_000_000)),
-        &[
-            rw!("comm-add"; "(+ ?a ?b)" => "(+ ?b ?a)"),
-            rw!("assoc-add"; "(+ ?a (+ ?b ?c))" => "(+ (+ ?a ?b) ?c)"),
-        ],
-        generate_ascending_rpn(n).parse().unwrap(),
-        &[generate_descending_rpn(n).parse().unwrap()],
-        Some(|_: Runner<math::Math, ()>| ()),
-        true
-    )
-}
-
-fn diff_power_harder_iterator() {
-    egg::test::test_runner(
-        "diff_power_harder",
-        Some(Runner::default()
-                .with_scheduler(IteratorScheduler)
-                .with_time_limit(std::time::Duration::from_secs(30))
-                .with_iter_limit(60)
-                .with_node_limit(100_000)
-                // .with_explanations_enabled()
-                // HACK this needs to "see" the end expression
-                .with_expr(&"(* x (- (* 3 x) 14))".parse().unwrap())),
-        &math::rules(),
-        "(d x (- (pow x 3) (* 7 (pow x 2))))".parse().unwrap(),
-        &["(* x (- (* 3 x) 14))".parse().unwrap()],
-        None,
-        true
-    )
-}
-
-fn diff_power_harder_parallel_iterator() {
-    egg::test::test_runner(
-        "diff_power_harder",
         Some(Runner::default()
                 .with_scheduler(ParallelIteratorScheduler)
-                .with_time_limit(std::time::Duration::from_secs(10))
+                .with_time_limit(std::time::Duration::from_secs(30))
                 .with_iter_limit(60)
-                .with_node_limit(100_000)
-                // .with_explanations_enabled()
-                // HACK this needs to "see" the end expression
-                .with_expr(&"(* x (- (* 3 x) 14))".parse().unwrap())),
-        &math::rules(),
-        "(d x (- (pow x 3) (* 7 (pow x 2))))".parse().unwrap(),
-        &["(* x (- (* 3 x) 14))".parse().unwrap()],
-        None,
+                .with_node_limit(50_000_000)),
+        &[
+            rw!("comm-add"; "(+ ?a ?b)" => "(+ ?b ?a)"),
+            rw!("assoc-add"; "(+ ?a (+ ?b ?c))" => "(+ (+ ?a ?b) ?c)"),
+        ],
+        generate_ascending_rpn(n).parse().unwrap(),
+        &[generate_descending_rpn(n).parse().unwrap()],
+        Some(|_: Runner<math::Math, ()>| ()),
         true
     )
 }
+
 
 
 pub fn math_test_serial(c: &mut Criterion) {
-    let mut group = c.benchmark_group("math_test_serial");
-    group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
-    group.bench_function(
-        "diff_power_harder_iterator",
+    c.bench_function(
+        "math_test_serial",
         |b| b.iter(diff_power_harder_iterator)
     );
-    // group.bench_function(
-    //     "math_associate_adds_iterator_parameterised",
-    //     |b| b.iter(|| math_associate_adds_iterator_parameterised(11))
-    // );
-    group.finish();
 }
 
 pub fn math_test_parallel(c: &mut Criterion) {
-    let mut group = c.benchmark_group("math_test_parallel");
+    c.bench_function(
+        "math_test_parallel",
+        |b| b.iter(diff_power_harder_parallel)
+    );
+}
+
+pub fn math_scaling_serial(c: &mut Criterion) {
+    let mut group = c.benchmark_group("math_scaling_serial");
     group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
     group.bench_function(
-        "diff_power_harder_parallel_iterator",
-        |b| b.iter(diff_power_harder_parallel_iterator)
+        "serial",
+        |b| b.iter(|| math_associate_adds_iterator(11))
     );
-    // group.bench_function(
-    //     "math_associate_adds_iterator_parallel_parameterised",
-    //     |b| b.iter(|| math_associate_adds_iterator_parallel_parameterised(11))
-    // );
+    group.finish();
+}
+
+pub fn math_scaling_parallel(c: &mut Criterion) {
+    let mut group = c.benchmark_group("math_scaling_parallel");
+    group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
+    group.bench_function(
+        "parallel",
+        |b| b.iter(|| math_associate_adds_parallel(11))
+    );
     group.finish();
 }
 
 pub fn math_test_comparison(c: &mut Criterion) {
     let mut group = c.benchmark_group("math_test_comparison");
     group.bench_function(
-        "diff_power_harder_iterator",
+        "serial",
         |b| b.iter(diff_power_harder_iterator)
     );
     group.bench_function(
-        "diff_power_harder_parallel_iterator",
-        |b| b.iter(diff_power_harder_parallel_iterator)
+        "parallel",
+        |b| b.iter(diff_power_harder_parallel)
     );
     group.finish();
 }
 
-pub fn math_test_comparison_scaling(c: &mut Criterion) {
-    let mut group = c.benchmark_group("lambda_test_comparison_scaling");
+pub fn math_scaling_comparison(c: &mut Criterion) {
+    let mut group = c.benchmark_group("math_scaling_comparison");
     group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
     for i in 3..12 {
-        group.bench_with_input(BenchmarkId::new("math_associate_adds_iterator_parameterised", i), &i,
-        |b, i| b.iter(|| math_associate_adds_iterator_parameterised(*i)));
-        group.bench_with_input(BenchmarkId::new("lambda_function_repeat_parallel_iterator", i), &i,
-        |b, i| b.iter(|| math_associate_adds_iterator_parallel_parameterised(*i)));
+        group.bench_with_input(BenchmarkId::new("serial", i), &i,
+        |b, i| b.iter(|| math_associate_adds_iterator(*i)));
+        group.bench_with_input(BenchmarkId::new("parallel", i), &i,
+        |b, i| b.iter(|| math_associate_adds_parallel(*i)));
     }
     group.finish();
 }
@@ -529,7 +537,9 @@ criterion_group!(
     // math_tests,
     // math_test_serial,
     // math_test_parallel,
-    // math_test_comparison
-    math_test_comparison_scaling
+    // math_scaling_serial,
+    // math_scaling_parallel,
+    // math_test_comparison,
+    math_scaling_comparison
 );
 criterion_main!(benches);

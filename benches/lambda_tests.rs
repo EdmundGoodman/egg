@@ -336,14 +336,6 @@ pub fn lambda_test_parallel(c: &mut Criterion) {
 
 pub fn lambda_test_comparison_large(c: &mut Criterion) {
     let mut group = c.benchmark_group("lambda_test_comparison_large");
-    // group.bench_function(
-    //     "lambda_function_repeat_iterator",
-    //     |b| b.iter(lambda_function_repeat_iterator(3))
-    // );
-    // group.bench_function(
-    //     "lambda_function_repeat_parallel_iterator",
-    //     |b| b.iter(|| lambda_function_repeat_parallel_iterator(3))
-    // );
     group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
     for i in 2..6 {
         group.bench_with_input(BenchmarkId::new("lambda_function_repeat_iterator", i), &i,
