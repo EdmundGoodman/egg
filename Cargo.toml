@@ -47,24 +47,24 @@ criterion = "0.3"
 # name = "simple"
 # harness = false
 
-# [[bench]]
-# name = "math_tests"
-# harness = false
+[[bench]]
+name = "math_tests"
+harness = false
 
 # [[bench]]
 # name = "math_benches"
 # harness = false
 
-[[bench]]
-name = "lambda_tests"
-harness = false
+# [[bench]]
+# name = "lambda_tests"
+# harness = false
 
 # [[bench]]
 # name = "lambda_benches"
 # harness = false
 
-# [profile.bench]
-# debug = true
+[profile.bench]
+debug = true
 # codegen-units = 1
 # lto = "fat"
 

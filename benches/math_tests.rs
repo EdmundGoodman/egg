@@ -6,7 +6,7 @@ use schedulers::schedulers::{IteratorScheduler, ParallelIteratorScheduler};
 mod definitions;
 use definitions::math;
 
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion, BenchmarkId};
 
 fn math_associate_adds() {
     egg::test::test_runner(
@@ -270,6 +270,7 @@ fn integ_part3() {
 
 pub fn math_tests(c: &mut Criterion) {
     let mut group = c.benchmark_group("math_tests");
+    group.sample_size(20);
     group.bench_function(
         "math_associate_adds",
         |b| b.iter(math_associate_adds)
@@ -354,12 +355,88 @@ pub fn math_tests(c: &mut Criterion) {
 }
 
 
+fn generate_ascending_rpn(n: usize) -> String {
+    if n == 0 {
+        return String::new();
+    }
+    if n == 1 {
+        return "1".to_string();
+    }
+
+    // Start with innermost two numbers
+    let mut result = format!("{}", n);
+
+    // Add layers from n-1 down to 1
+    for i in (1..n).rev() {
+        result = format!("(+ {} {})", i, result);
+    }
+
+    result
+}
+
+fn generate_descending_rpn(n: usize) -> String {
+    if n == 0 {
+        return String::new();
+    }
+    if n == 1 {
+        return "1".to_string();
+    }
+
+    // Start with innermost two numbers
+    let mut result = "1".to_string();
+
+    // Add layers from 2 up to n
+    for i in 2..=n {
+        result = format!("(+ {} {})", i, result);
+    }
+
+    result
+ }
+
+fn math_associate_adds_iterator_parameterised(n: usize) {
+    egg::test::test_runner(
+        "math_associate_adds",
+        Some(Runner::default()
+                .with_scheduler(IteratorScheduler)
+                .with_time_limit(std::time::Duration::from_secs(10))
+                .with_iter_limit(60)
+                .with_node_limit(50_000_000)),
+        &[
+            rw!("comm-add"; "(+ ?a ?b)" => "(+ ?b ?a)"),
+            rw!("assoc-add"; "(+ ?a (+ ?b ?c))" => "(+ (+ ?a ?b) ?c)"),
+        ],
+        generate_ascending_rpn(n).parse().unwrap(),
+        &[generate_descending_rpn(n).parse().unwrap()],
+        Some(|_: Runner<math::Math, ()>| ()),
+        true
+    )
+}
+
+fn math_associate_adds_iterator_parallel_parameterised(n: usize) {
+    egg::test::test_runner(
+        "math_associate_adds",
+        Some(Runner::default()
+                .with_scheduler(IteratorScheduler)
+                .with_time_limit(std::time::Duration::from_secs(30))
+                .with_iter_limit(60)
+                .with_node_limit(50_000_000)),
+        &[
+            rw!("comm-add"; "(+ ?a ?b)" => "(+ ?b ?a)"),
+            rw!("assoc-add"; "(+ ?a (+ ?b ?c))" => "(+ (+ ?a ?b) ?c)"),
+        ],
+        generate_ascending_rpn(n).parse().unwrap(),
+        &[generate_descending_rpn(n).parse().unwrap()],
+        Some(|_: Runner<math::Math, ()>| ()),
+        true
+    )
+}
+
 fn diff_power_harder_iterator() {
     egg::test::test_runner(
         "diff_power_harder",
         Some(Runner::default()
                 .with_scheduler(IteratorScheduler)
-                .with_time_limit(std::time::Duration::from_secs(10))
+                .with_time_limit(std::time::Duration::from_secs(30))
                 .with_iter_limit(60)
                 .with_node_limit(100_000)
                 // .with_explanations_enabled()
@@ -400,6 +477,10 @@ pub fn math_test_serial(c: &mut Criterion) {
         "diff_power_harder_iterator",
         |b| b.iter(diff_power_harder_iterator)
     );
+    // group.bench_function(
+    //     "math_associate_adds_iterator_parameterised",
+    //     |b| b.iter(|| math_associate_adds_iterator_parameterised(11))
+    // );
     group.finish();
 }
 
@@ -410,6 +491,10 @@ pub fn math_test_parallel(c: &mut Criterion) {
         "diff_power_harder_parallel_iterator",
         |b| b.iter(diff_power_harder_parallel_iterator)
     );
+    // group.bench_function(
+    //     "math_associate_adds_iterator_parallel_parameterised",
+    //     |b| b.iter(|| math_associate_adds_iterator_parallel_parameterised(11))
+    // );
     group.finish();
 }
 
@@ -424,15 +509,27 @@ pub fn math_test_comparison(c: &mut Criterion) {
         |b| b.iter(diff_power_harder_parallel_iterator)
     );
     group.finish();
+}
 
+pub fn math_test_comparison_scaling(c: &mut Criterion) {
+    let mut group = c.benchmark_group("lambda_test_comparison_scaling");
+    group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
+    for i in 3..12 {
+        group.bench_with_input(BenchmarkId::new("math_associate_adds_iterator_parameterised", i), &i,
+        |b, i| b.iter(|| math_associate_adds_iterator_parameterised(*i)));
+        group.bench_with_input(BenchmarkId::new("lambda_function_repeat_parallel_iterator", i), &i,
+        |b, i| b.iter(|| math_associate_adds_iterator_parallel_parameterised(*i)));
+    }
+    group.finish();
 }
 
 // criterion_group!(benches, math_tests);
 criterion_group!(
     benches,
-    math_tests,
+    // math_tests,
     // math_test_serial,
     // math_test_parallel,
-    math_test_comparison
+    // math_test_comparison
+    math_test_comparison_scaling
 );
 criterion_main!(benches);

@@ -257,56 +257,14 @@ fn lambda_let_simple_parallel_iterator() {
     );
 }
 
-fn lambda_compose_iterator() {
-    egg::test::test_runner(
-        "lambda_compose",
-        Some(Runner::default()
-            .with_scheduler(IteratorScheduler)),
-        &lambda::rules(),
-        "(let compose (lam f (lam g (lam x (app (var f)
-                                       (app (var g) (var x))))))
-     (let add1 (lam y (+ (var y) 1))
-     (app (app (var compose) (var add1)) (var add1))))".parse().unwrap(),
-        &[
-            "(lam ?x (+ 1
-                (app (lam ?y (+ 1 (var ?y)))
-                     (var ?x))))".parse().unwrap(),
-                "(lam ?x (+ (var ?x) 2))".parse().unwrap()
-        ],
-        None,
-        true
-    );
-}
-
-fn lambda_compose_parallel_iterator() {
-    egg::test::test_runner(
-        "lambda_compose",
-        Some(Runner::default()
-            .with_scheduler(ParallelIteratorScheduler)),
-        &lambda::rules(),
-        "(let compose (lam f (lam g (lam x (app (var f)
-                                       (app (var g) (var x))))))
-     (let add1 (lam y (+ (var y) 1))
-     (app (app (var compose) (var add1)) (var add1))))".parse().unwrap(),
-        &[
-            "(lam ?x (+ 1
-                (app (lam ?y (+ 1 (var ?y)))
-                     (var ?x))))".parse().unwrap(),
-                "(lam ?x (+ (var ?x) 2))".parse().unwrap()
-        ],
-        None,
-        true
-    );
-}
-
-fn lambda_function_repeat_iterator(repeats: i32) {
+fn lambda_function_repeat_iterator(repeats: u32) {
     egg::test::test_runner(
         "lambda_function_repeat",
         Some(Runner::default()
             .with_scheduler(IteratorScheduler)
             .with_time_limit(std::time::Duration::from_secs(20))
             .with_node_limit(25_000_000)
-            .with_iter_limit(60)),
+            .with_iter_limit(1000)),
         &lambda::rules(),
         format!("(let compose (lam f (lam g (lam x (app (var f)
                                        (app (var g) (var x))))))
@@ -327,7 +285,7 @@ fn lambda_function_repeat_iterator(repeats: i32) {
     );
 }
 
-fn lambda_function_repeat_parallel_iterator(repeats: i32) {
+fn lambda_function_repeat_parallel_iterator(repeats: u32) {
     egg::test::test_runner(
         "lambda_function_repeat",
         Some(Runner::default()
@@ -361,7 +319,7 @@ pub fn lambda_test_serial(c: &mut Criterion) {
     group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
     group.bench_function(
         "lambda_function_repeat_iterator",
-        |b| b.iter(|| lambda_function_repeat_iterator(3))
+        |b| b.iter(|| lambda_function_repeat_iterator(6))
     );
     group.finish();
 }
@@ -399,14 +357,6 @@ pub fn lambda_test_comparison_large(c: &mut Criterion) {
 pub fn lambda_test_comparison_small(c: &mut Criterion) {
     let mut group = c.benchmark_group("lambda_test_comparison_small");
     group.bench_function(
-        "lambda_compose_iterator",
-        |b| b.iter(lambda_compose_iterator)
-    );
-    group.bench_function(
-        "lambda_compose_parallel_iterator",
-        |b| b.iter(lambda_compose_parallel_iterator)
-    );
-    group.bench_function(
         "lambda_let_simple_iterator",
         |b| b.iter(lambda_let_simple_iterator)
     );
@@ -420,10 +370,10 @@ pub fn lambda_test_comparison_small(c: &mut Criterion) {
 
 criterion_group!(
     benches,
-    // lambda_tests,
+    lambda_tests,
     // lambda_test_serial,
     // lambda_test_parallel,
     // lambda_test_comparison_small,
-    lambda_test_comparison_large
+    // lambda_test_comparison_large
 );
 criterion_main!(benches);

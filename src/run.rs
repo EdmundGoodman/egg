@@ -350,6 +350,7 @@ where
             stop_reason: None,
             hooks: vec![],
             scheduler: Box::new(BackoffScheduler::default()),
+            // scheduler: Box::new(SimpleScheduler),
         }
     }
 
