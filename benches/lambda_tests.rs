@@ -242,7 +242,7 @@ fn lambda_let_simple_iterator() {
     );
 }
 
-fn lambda_let_simple_parallel_iterator() {
+fn lambda_let_simple_parallel() {
     egg::test::test_runner(
         "lambda_let_simple",
         Some(Runner::default()
@@ -285,7 +285,7 @@ fn lambda_function_repeat_iterator(repeats: u32) {
     );
 }
 
-fn lambda_function_repeat_parallel_iterator(repeats: u32) {
+fn lambda_function_repeat_parallel(repeats: u32) {
     egg::test::test_runner(
         "lambda_function_repeat",
         Some(Runner::default()
@@ -313,13 +313,77 @@ fn lambda_function_repeat_parallel_iterator(repeats: u32) {
     );
 }
 
+fn fibonacci(n: u32) -> u32 {
+    if n <= 1 {
+        return n;
+    }
+    let mut a = 0;
+    let mut b = 1;
+    for _ in 2..=n {
+        let temp = a + b;
+        a = b;
+        b = temp;
+    }
+    b
+}
+
+fn lambda_fib_iterator(n: u32) {
+     egg::test::test_runner(
+        "lambda_fib",
+         Some(Runner::default()
+            .with_scheduler(IteratorScheduler)
+            .with_time_limit(std::time::Duration::from_secs(60))
+            .with_node_limit(25_000_000)
+            .with_iter_limit(60)),
+            &lambda::rules(),
+            format!("(let fib (fix fib (lam n
+            (if (= (var n) 0)
+                0
+            (if (= (var n) 1)
+                1
+            (+ (app (var fib)
+                    (+ (var n) -1))
+                (app (var fib)
+                    (+ (var n) -2)))))))
+            (app (var fib) {n}))").parse().unwrap(),
+            &[fibonacci(n).to_string().parse().unwrap()],
+         None,
+         true
+     );
+ }
+
+ fn lambda_fib_parallel(n: u32) {
+    egg::test::test_runner(
+       "lambda_fib",
+        Some(Runner::default()
+           .with_scheduler(ParallelIteratorScheduler)
+           .with_time_limit(std::time::Duration::from_secs(60))
+           .with_node_limit(25_000_000)
+           .with_iter_limit(60)),
+           &lambda::rules(),
+           format!("(let fib (fix fib (lam n
+           (if (= (var n) 0)
+               0
+           (if (= (var n) 1)
+               1
+           (+ (app (var fib)
+                   (+ (var n) -1))
+               (app (var fib)
+                   (+ (var n) -2)))))))
+           (app (var fib) {n}))").parse().unwrap(),
+           &[fibonacci(n).to_string().parse().unwrap()],
+        None,
+        true
+    );
+}
+
 
 pub fn lambda_test_serial(c: &mut Criterion) {
     let mut group = c.benchmark_group("lambda_test_serial");
     group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
     group.bench_function(
-        "lambda_function_repeat_iterator",
-        |b| b.iter(|| lambda_function_repeat_iterator(6))
+        "lambda_fib_iterator",
+        |b| b.iter(|| lambda_fib_iterator(6))
     );
     group.finish();
 }
@@ -328,8 +392,8 @@ pub fn lambda_test_parallel(c: &mut Criterion) {
     let mut group = c.benchmark_group("lambda_test_parallel");
     group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
     group.bench_function(
-        "lambda_function_repeat_parallel_iterator",
-        |b| b.iter(|| lambda_function_repeat_parallel_iterator(3))
+        "lambda_fib_parallel",
+        |b| b.iter(|| lambda_fib_parallel(5))
     );
     group.finish();
 }
@@ -340,8 +404,8 @@ pub fn lambda_test_comparison_large(c: &mut Criterion) {
     for i in 2..6 {
         group.bench_with_input(BenchmarkId::new("lambda_function_repeat_iterator", i), &i,
         |b, i| b.iter(|| lambda_function_repeat_iterator(*i)));
-        group.bench_with_input(BenchmarkId::new("lambda_function_repeat_parallel_iterator", i), &i,
-        |b, i| b.iter(|| lambda_function_repeat_parallel_iterator(*i)));
+        group.bench_with_input(BenchmarkId::new("lambda_function_repeat_parallel", i), &i,
+        |b, i| b.iter(|| lambda_function_repeat_parallel(*i)));
     }
     group.finish();
 }
@@ -353,8 +417,8 @@ pub fn lambda_test_comparison_small(c: &mut Criterion) {
         |b| b.iter(lambda_let_simple_iterator)
     );
     group.bench_function(
-        "lambda_let_simple_parallel_iterator",
-        |b| b.iter(lambda_let_simple_parallel_iterator)
+        "lambda_let_simple_parallel",
+        |b| b.iter(lambda_let_simple_parallel)
     );
     group.finish();
 
@@ -362,8 +426,8 @@ pub fn lambda_test_comparison_small(c: &mut Criterion) {
 
 criterion_group!(
     benches,
-    lambda_tests,
-    // lambda_test_serial,
+    // lambda_tests,
+    lambda_test_serial,
     // lambda_test_parallel,
     // lambda_test_comparison_small,
     // lambda_test_comparison_large

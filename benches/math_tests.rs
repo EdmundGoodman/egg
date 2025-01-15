@@ -359,7 +359,7 @@ fn diff_power_harder_iterator() {
         "diff_power_harder",
         Some(Runner::default()
                 .with_scheduler(IteratorScheduler)
-                .with_time_limit(std::time::Duration::from_secs(30))
+                .with_time_limit(std::time::Duration::from_secs(10))
                 .with_iter_limit(60)
                 .with_node_limit(100_000)
                 // .with_explanations_enabled()
@@ -437,7 +437,7 @@ fn math_associate_adds_iterator(n: usize) {
         "math_associate_adds",
         Some(Runner::default()
                 .with_scheduler(IteratorScheduler)
-                .with_time_limit(std::time::Duration::from_secs(10))
+                .with_time_limit(std::time::Duration::from_secs(120))
                 .with_iter_limit(60)
                 .with_node_limit(50_000_000)),
         &[
@@ -456,7 +456,7 @@ fn math_associate_adds_parallel(n: usize) {
         "math_associate_adds",
         Some(Runner::default()
                 .with_scheduler(ParallelIteratorScheduler)
-                .with_time_limit(std::time::Duration::from_secs(30))
+                .with_time_limit(std::time::Duration::from_secs(120))
                 .with_iter_limit(60)
                 .with_node_limit(50_000_000)),
         &[

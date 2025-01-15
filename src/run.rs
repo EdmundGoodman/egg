@@ -4,6 +4,11 @@ use log::*;
 
 use crate::*;
 
+use peak_alloc::PeakAlloc;
+
+#[global_allocator]
+static PEAK_ALLOC: PeakAlloc = PeakAlloc;
+
 /** Faciliates running rewrites over an [`EGraph`].
 
 One use for [`EGraph`]s is as the basis of a rewriting system.
@@ -583,6 +588,7 @@ where
                     }
                     debug!("Applied {} {} times", rw.name, actually_matched);
                 }
+                info!("Current allocated memory: {}MB", PEAK_ALLOC.current_usage_as_mb());
                 self.check_limits()
             })
         });
@@ -598,6 +604,7 @@ where
 
         let rebuild_time = rebuild_time.elapsed().as_secs_f64();
         info!("Rebuild time: {}", rebuild_time);
+        // info!("Current allocated memory: {}MB", PEAK_ALLOC.current_usage_as_mb());
         info!(
             "Size: n={}, e={}",
             self.egraph.total_size(),

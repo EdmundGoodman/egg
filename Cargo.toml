@@ -37,6 +37,7 @@ serde_json = {version = "1.0.81", optional = true}
 
 # for parallelisation support
 rayon = "1.8"
+peak_alloc = "0.2.1"
 # rayon = { version = "1.8", optional = true }
 
 [dev-dependencies]
@@ -44,11 +45,11 @@ ordered-float = "3.0.0"
 criterion = "0.3"
 
 # [[bench]]
-# name = "simple"
+# name = "math_tests"
 # harness = false
 
 [[bench]]
-name = "math_tests"
+name = "lambda_tests"
 harness = false
 
 # [[bench]]
@@ -56,11 +57,11 @@ harness = false
 # harness = false
 
 # [[bench]]
-# name = "lambda_tests"
+# name = "lambda_benches"
 # harness = false
 
 # [[bench]]
-# name = "lambda_benches"
+# name = "simple"
 # harness = false
 
 [profile.bench]
