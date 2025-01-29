@@ -41,6 +41,7 @@ bench:
 .PHONY: profile.json
 profile.json:
 	cargo build --profile bench && samply record cargo bench
+# cargo build --profile bench && samply record --rate 10000 cargo bench
 
 .PHONY: flamegraph.svg
 flamegraph.svg:

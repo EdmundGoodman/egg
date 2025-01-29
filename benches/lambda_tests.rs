@@ -379,45 +379,45 @@ fn lambda_fib_iterator(n: u32) {
 
 
 pub fn lambda_test_serial(c: &mut Criterion) {
-    let mut group = c.benchmark_group("lambda_test_serial");
+    let mut group = c.benchmark_group("lambda_test");
     group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
     group.bench_function(
-        "lambda_fib_iterator",
-        |b| b.iter(|| lambda_fib_iterator(6))
+        "fib_iterator",
+        |b| b.iter(|| lambda_fib_iterator(5))
     );
     group.finish();
 }
 
 pub fn lambda_test_parallel(c: &mut Criterion) {
-    let mut group = c.benchmark_group("lambda_test_parallel");
+    let mut group = c.benchmark_group("lambda_test");
     group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
     group.bench_function(
-        "lambda_fib_parallel",
+        "fib_parallel",
         |b| b.iter(|| lambda_fib_parallel(5))
     );
     group.finish();
 }
 
 pub fn lambda_test_comparison_large(c: &mut Criterion) {
-    let mut group = c.benchmark_group("lambda_test_comparison_large");
+    let mut group = c.benchmark_group("lambda_comparison_large");
     group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
     for i in 2..6 {
-        group.bench_with_input(BenchmarkId::new("lambda_function_repeat_iterator", i), &i,
+        group.bench_with_input(BenchmarkId::new("function_repeat_iterator", i), &i,
         |b, i| b.iter(|| lambda_function_repeat_iterator(*i)));
-        group.bench_with_input(BenchmarkId::new("lambda_function_repeat_parallel", i), &i,
+        group.bench_with_input(BenchmarkId::new("function_repeat_parallel", i), &i,
         |b, i| b.iter(|| lambda_function_repeat_parallel(*i)));
     }
     group.finish();
 }
 
 pub fn lambda_test_comparison_small(c: &mut Criterion) {
-    let mut group = c.benchmark_group("lambda_test_comparison_small");
+    let mut group = c.benchmark_group("lambda_comparison_small");
     group.bench_function(
-        "lambda_let_simple_iterator",
+        "let_simple_iterator",
         |b| b.iter(lambda_let_simple_iterator)
     );
     group.bench_function(
-        "lambda_let_simple_parallel",
+        "let_simple_parallel",
         |b| b.iter(lambda_let_simple_parallel)
     );
     group.finish();

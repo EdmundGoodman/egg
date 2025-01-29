@@ -474,20 +474,20 @@ fn math_associate_adds_parallel(n: usize) {
 
 pub fn math_test_serial(c: &mut Criterion) {
     c.bench_function(
-        "math_test_serial",
+        "diff_power_harder",
         |b| b.iter(diff_power_harder_iterator)
     );
 }
 
 pub fn math_test_parallel(c: &mut Criterion) {
     c.bench_function(
-        "math_test_parallel",
+        "diff_power_harder_parallel",
         |b| b.iter(diff_power_harder_parallel)
     );
 }
 
 pub fn math_scaling_serial(c: &mut Criterion) {
-    let mut group = c.benchmark_group("math_scaling_serial");
+    let mut group = c.benchmark_group("math_scaling");
     group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
     group.bench_function(
         "serial",
@@ -497,7 +497,7 @@ pub fn math_scaling_serial(c: &mut Criterion) {
 }
 
 pub fn math_scaling_parallel(c: &mut Criterion) {
-    let mut group = c.benchmark_group("math_scaling_parallel");
+    let mut group = c.benchmark_group("math_scaling");
     group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
     group.bench_function(
         "parallel",
@@ -507,7 +507,7 @@ pub fn math_scaling_parallel(c: &mut Criterion) {
 }
 
 pub fn math_test_comparison(c: &mut Criterion) {
-    let mut group = c.benchmark_group("math_test_comparison");
+    let mut group = c.benchmark_group("diff_power_harder_comparison");
     group.bench_function(
         "serial",
         |b| b.iter(diff_power_harder_iterator)
@@ -522,7 +522,7 @@ pub fn math_test_comparison(c: &mut Criterion) {
 pub fn math_scaling_comparison(c: &mut Criterion) {
     let mut group = c.benchmark_group("math_scaling_comparison");
     group.sample_size(10); // Bound the number of samples to avoid overwhelming profiler
-    for i in 3..12 {
+    for i in 5..12 {
         group.bench_with_input(BenchmarkId::new("serial", i), &i,
         |b, i| b.iter(|| math_associate_adds_iterator(*i)));
         group.bench_with_input(BenchmarkId::new("parallel", i), &i,
@@ -536,10 +536,10 @@ criterion_group!(
     benches,
     // math_tests,
     // math_test_serial,
-    // math_test_parallel,
+    math_test_parallel,
     // math_scaling_serial,
     // math_scaling_parallel,
     // math_test_comparison,
-    math_scaling_comparison
+    // math_scaling_comparison
 );
 criterion_main!(benches);

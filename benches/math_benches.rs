@@ -116,5 +116,10 @@ pub fn math_ematching_benches_comparison(c: &mut Criterion) {
 
 }
 
-criterion_group!(benches, math_ematching_benches_comparison);
+criterion_group!(
+    benches,
+    math_ematching_benches_serial,
+    // math_ematching_benches_parallel,
+    // math_ematching_benches_comparison
+);
 criterion_main!(benches);
