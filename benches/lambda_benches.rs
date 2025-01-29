@@ -124,5 +124,8 @@ pub fn lambda_ematching_benches_comparison(c: &mut Criterion) {
 
 }
 
-criterion_group!(benches, lambda_ematching_benches_comparison);
+criterion_group!(
+    benches,
+    lambda_ematching_benches_comparison
+);
 criterion_main!(benches);

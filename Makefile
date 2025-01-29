@@ -40,11 +40,13 @@ bench:
 
 .PHONY: profile.json
 profile.json:
+	@echo "Make sure only one benchmark is running at a time to avoid very large profile files"
 	cargo build --profile bench && samply record cargo bench
 # cargo build --profile bench && samply record --rate 10000 cargo bench
 
 .PHONY: flamegraph.svg
 flamegraph.svg:
+	@echo "Make sure only one benchmark is running at a time to avoid very large profile files""
 	cargo flamegraph --root --bench math_tests -- --bench &&\
 		open -a /Applications/Firefox.app flamegraph.svg
 

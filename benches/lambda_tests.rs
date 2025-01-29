@@ -426,10 +426,10 @@ pub fn lambda_test_comparison_small(c: &mut Criterion) {
 
 criterion_group!(
     benches,
-    // lambda_tests,
+    lambda_tests,
     lambda_test_serial,
-    // lambda_test_parallel,
-    // lambda_test_comparison_small,
-    // lambda_test_comparison_large
+    lambda_test_parallel,
+    lambda_test_comparison_small,
+    lambda_test_comparison_large
 );
 criterion_main!(benches);

@@ -38,31 +38,30 @@ serde_json = {version = "1.0.81", optional = true}
 # for parallelisation support
 rayon = "1.8"
 peak_alloc = "0.2.1"
-# rayon = { version = "1.8", optional = true }
 
 [dev-dependencies]
 ordered-float = "3.0.0"
 criterion = "0.3"
 
-# [[bench]]
-# name = "math_tests"
-# harness = false
+[[bench]]
+name = "math_tests"
+harness = false
 
 [[bench]]
 name = "lambda_tests"
 harness = false
 
-# [[bench]]
-# name = "math_benches"
-# harness = false
+[[bench]]
+name = "math_benches"
+harness = false
 
-# [[bench]]
-# name = "lambda_benches"
-# harness = false
+[[bench]]
+name = "lambda_benches"
+harness = false
 
-# [[bench]]
-# name = "simple"
-# harness = false
+[[bench]]
+name = "simple"
+harness = false
 
 [profile.bench]
 debug = true
@@ -87,7 +86,6 @@ serde-1 = [
   "vectorize",
 ]
 wasm-bindgen = []
-# parallel = ["rayon"]
 
 # private features for testing
 test-explanations = []

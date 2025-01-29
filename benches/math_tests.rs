@@ -534,12 +534,12 @@ pub fn math_scaling_comparison(c: &mut Criterion) {
 // criterion_group!(benches, math_tests);
 criterion_group!(
     benches,
-    // math_tests,
+    math_tests,
     // math_test_serial,
-    math_test_parallel,
+    // math_test_parallel,
     // math_scaling_serial,
     // math_scaling_parallel,
-    // math_test_comparison,
-    // math_scaling_comparison
+    math_test_comparison,
+    math_scaling_comparison
 );
 criterion_main!(benches);
