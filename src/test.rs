@@ -80,7 +80,8 @@ pub fn test_runner<L, A>(
 
     if should_check {
         let report = runner.report();
-        println!("{report}");
+        // println!("{report}");
+        log::info!("{report}");
         runner.egraph.check_goals(id, goals);
 
         if let Some(filename) = env_var::<PathBuf>("EGG_BENCH_CSV") {
@@ -134,6 +135,7 @@ pub fn bench_egraph<L, N>(
     rules: Vec<Rewrite<L, N>>,
     exprs: &[&str],
     extra_patterns: &[&str],
+    scheduled_runner: Option<Runner<L, N, ()>>,
 ) -> EGraph<L, N>
 where
     L: Language + FromOp + 'static + Display,
@@ -153,7 +155,8 @@ where
         patterns.push(p.ast.alpha_rename().into());
     }
 
-    eprintln!("{} patterns", patterns.len());
+    // eprintln!("{} patterns", patterns.len());
+    log::info!("{} patterns", patterns.len());
 
     patterns.retain(|p| p.ast.len() > 1);
     patterns.sort_by_key(|p| p.to_string());
@@ -164,17 +167,24 @@ where
     let node_limit = env_var("EGG_NODE_LIMIT").unwrap_or(1_000_000);
     let time_limit = env_var("EGG_TIME_LIMIT").unwrap_or(1000);
     let n_samples = env_var("EGG_SAMPLES").unwrap_or(100);
-    eprintln!("Benching {} samples", n_samples);
-    eprintln!(
+    // eprintln!("Benching {} samples", n_samples);
+    log::info!("Benching {} samples", n_samples);
+    // eprintln!(
+    log::info!(
         "Limits: {} iters, {} nodes, {} seconds",
         iter_limit, node_limit, time_limit
     );
 
-    let mut runner = Runner::default()
-        .with_scheduler(SimpleScheduler)
+    let mut runner = if let Some(runner_unwrapped) = scheduled_runner {
+        runner_unwrapped
+    } else {
+        Runner::default().with_scheduler(SimpleScheduler)
+    };
+    runner = runner
         .with_hook(move |runner| {
             let n_nodes = runner.egraph.total_number_of_nodes();
-            eprintln!("Iter {}, {} nodes", runner.iterations.len(), n_nodes);
+            // eprintln!("Iter {}, {} nodes", runner.iterations.len(), n_nodes);
+            log::info!("Iter {}, {} nodes", runner.iterations.len(), n_nodes);
             if n_nodes > node_limit {
                 Err("Bench stopped".into())
             } else {
@@ -190,7 +200,8 @@ where
     }
 
     let runner = runner.run(&rules);
-    eprintln!("{}", runner.report());
+    // eprintln!("{}", runner.report());
+    log::info!("{}", runner.report());
     let egraph = runner.egraph;
 
     let get_len = |pat: &Pattern<L>| pat.to_string().len();
@@ -207,7 +218,8 @@ where
             .collect();
         times.sort_unstable();
 
-        println!(
+        // println!(
+        log::info!(
             "test {name:<width$} ... bench: {time:>10} ns/iter (+/- {iqr})",
             name = pat.to_string().replace(' ', "_"),
             width = max_width,

@@ -35,8 +35,43 @@ vectorize = {version = "0.2.0", optional = true}
 saturating = "0.1.0"
 serde_json = {version = "1.0.81", optional = true}
 
+# for parallelisation support
+rayon = "1.8"
+peak_alloc = "0.2.1"
+
 [dev-dependencies]
 ordered-float = "3.0.0"
+criterion = "0.3"
+
+[[bench]]
+name = "math_tests"
+harness = false
+
+[[bench]]
+name = "lambda_tests"
+harness = false
+
+[[bench]]
+name = "math_benches"
+harness = false
+
+[[bench]]
+name = "lambda_benches"
+harness = false
+
+[[bench]]
+name = "simple"
+harness = false
+
+[profile.bench]
+debug = true
+# codegen-units = 1
+# lto = "fat"
+
+# [profile.release]
+# codegen-units = 1
+# lto = "fat"
+# panic = "abort"
 
 [features]
 # forces the use of indexmaps over hashmaps
